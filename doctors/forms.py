@@ -1,39 +1,42 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
-from .models import Doctor, Specialization, DoctorSchedule
+from .models import Doctor, Category, DoctorSchedule
 
 class DoctorRegistrationForm(UserCreationForm):
-    first_name = forms.CharField(max_length=30, required=True)
-    last_name = forms.CharField(max_length=30, required=True)
-    email = forms.EmailField(required=True)
-    specialization = forms.ModelChoiceField(queryset=Specialization.objects.all(), required=True)
-    license_number = forms.CharField(max_length=50, required=True)
-    phone_number = forms.CharField(max_length=17, required=True)
-    experience_years = forms.IntegerField(min_value=0, required=True)
-    consultation_fee = forms.DecimalField(max_digits=10, decimal_places=2, required=True)
-    bio = forms.CharField(widget=forms.Textarea, required=False)
+    name = forms.CharField(max_length=200, required=True, widget=forms.TextInput(attrs={'class': 'form-control'}))
+    phone_number = forms.CharField(max_length=17, required=True, widget=forms.TextInput(attrs={'class': 'form-control'}))
+    email = forms.EmailField(required=True, widget=forms.EmailInput(attrs={'class': 'form-control'}))
+    address = forms.CharField(widget=forms.Textarea(attrs={'class': 'form-control', 'rows': 3}), required=True, help_text="Location/Address")
+    qualification = forms.CharField(max_length=200, required=True, widget=forms.TextInput(attrs={'class': 'form-control'}))
+    category = forms.ModelChoiceField(queryset=Category.objects.all(), required=True, widget=forms.Select(attrs={'class': 'form-select'}))
     
     class Meta:
         model = User
-        fields = ('username', 'first_name', 'last_name', 'email', 'password1', 'password2')
+        fields = ('username', 'password1', 'password2')
+        widgets = {
+            'username': forms.TextInput(attrs={'class': 'form-control'}),
+        }
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['password1'].widget.attrs.update({'class': 'form-control'})
+        self.fields['password2'].widget.attrs.update({'class': 'form-control'})
     
     def save(self, commit=True):
         user = super().save(commit=False)
-        user.first_name = self.cleaned_data['first_name']
-        user.last_name = self.cleaned_data['last_name']
         user.email = self.cleaned_data['email']
         
         if commit:
             user.save()
             Doctor.objects.create(
                 user=user,
-                specialization=self.cleaned_data['specialization'],
-                license_number=self.cleaned_data['license_number'],
+                name=self.cleaned_data['name'],
                 phone_number=self.cleaned_data['phone_number'],
-                experience_years=self.cleaned_data['experience_years'],
-                consultation_fee=self.cleaned_data['consultation_fee'],
-                bio=self.cleaned_data['bio']
+                email=self.cleaned_data['email'],
+                address=self.cleaned_data['address'],
+                qualification=self.cleaned_data['qualification'],
+                category=self.cleaned_data['category']
             )
         return user
 
@@ -42,6 +45,7 @@ class DoctorScheduleForm(forms.ModelForm):
         model = DoctorSchedule
         fields = ['day_of_week', 'start_time', 'end_time']
         widgets = {
-            'start_time': forms.TimeInput(attrs={'type': 'time'}),
-            'end_time': forms.TimeInput(attrs={'type': 'time'}),
+            'day_of_week': forms.Select(attrs={'class': 'form-select'}),
+            'start_time': forms.TimeInput(attrs={'type': 'time', 'class': 'form-control'}),
+            'end_time': forms.TimeInput(attrs={'type': 'time', 'class': 'form-control'}),
         }

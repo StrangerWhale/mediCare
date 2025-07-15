@@ -23,9 +23,6 @@
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'home' %}">Home</a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'doctors:doctor_list' %}">Find Doctors</a>
-                    </li>
                     {% if user.is_authenticated %}
                         {% if user.patient %}
                             <li class="nav-item">
@@ -48,12 +45,10 @@
                     {% if user.is_authenticated %}
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown">
-                                <i class="fas fa-user me-1"></i>{{ user.get_full_name|default:user.username }}
+                                <i class="fas fa-user me-1"></i>{{ user.username }}
                             </a>
                             <ul class="dropdown-menu">
-                                {% if user.patient %}
-                                    <li><a class="dropdown-item" href="{% url 'patients:patient_profile' %}">Profile</a></li>
-                                {% elif user.doctor %}
+                                {% if user.doctor %}
                                     <li><a class="dropdown-item" href="{% url 'doctors:manage_schedule' %}">Manage Schedule</a></li>
                                 {% endif %}
                                 <li><hr class="dropdown-divider"></li>
@@ -102,7 +97,6 @@
                 <div class="col-md-6">
                     <h6>Quick Links</h6>
                     <ul class="list-unstyled">
-                        <li><a href="{% url 'doctors:doctor_list' %}" class="text-light">Find Doctors</a></li>
                         <li><a href="{% url 'patients:patient_register' %}" class="text-light">Register as Patient</a></li>
                         <li><a href="{% url 'doctors:doctor_register' %}" class="text-light">Register as Doctor</a></li>
                     </ul>

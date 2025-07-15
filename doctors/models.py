@@ -2,27 +2,30 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.core.validators import RegexValidator
 
-class Specialization(models.Model):
+class Category(models.Model):
     name = models.CharField(max_length=100, unique=True)
     description = models.TextField(blank=True)
     
     def __str__(self):
         return self.name
+    
+    class Meta:
+        verbose_name_plural = "Categories"
 
 class Doctor(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    specialization = models.ForeignKey(Specialization, on_delete=models.CASCADE)
-    license_number = models.CharField(max_length=50, unique=True)
+    name = models.CharField(max_length=200)
     phone_regex = RegexValidator(regex=r'^\+?1?\d{9,15}$', message="Phone number must be entered in the format: '+999999999'. Up to 15 digits allowed.")
     phone_number = models.CharField(validators=[phone_regex], max_length=17)
-    experience_years = models.PositiveIntegerField()
-    consultation_fee = models.DecimalField(max_digits=10, decimal_places=2)
-    bio = models.TextField(blank=True)
+    email = models.EmailField()
+    address = models.TextField(help_text="Location/Address")
+    qualification = models.CharField(max_length=200)
+    category = models.ForeignKey(Category, on_delete=models.CASCADE)
     is_available = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
     
     def __str__(self):
-        return f"Dr. {self.user.get_full_name()} - {self.specialization.name}"
+        return f"Dr. {self.name} - {self.category.name}"
 
 class DoctorSchedule(models.Model):
     DAYS_OF_WEEK = [
@@ -45,4 +48,4 @@ class DoctorSchedule(models.Model):
         unique_together = ['doctor', 'day_of_week']
     
     def __str__(self):
-        return f"{self.doctor.user.get_full_name()} - {self.day_of_week} ({self.start_time} - {self.end_time})"
+        return f"{self.doctor.name} - {self.day_of_week} ({self.start_time} - {self.end_time})"
