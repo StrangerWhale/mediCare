@@ -28,7 +28,6 @@ class Patient(models.Model):
     emergency_contact = models.CharField(max_length=15)
     medical_history = models.TextField(blank=True)
     allergies = models.TextField(blank=True)
-    profile_image = models.ImageField(upload_to='patients/', blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     

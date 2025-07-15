@@ -16,7 +16,6 @@ class Doctor(models.Model):
     experience_years = models.IntegerField()
     consultation_fee = models.DecimalField(max_digits=10, decimal_places=2)
     bio = models.TextField(blank=True)
-    profile_image = models.ImageField(upload_to='doctors/', blank=True, null=True)
     is_available = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
     
