@@ -1,0 +1,115 @@
+{% extends 'base.html' %}
+
+{% block title %}Dr. {{ doctor.user.get_full_name }} - mediCare{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8">
+        <div class="doctor-profile">
+            <div class="d-flex align-items-center mb-4">
+                <div class="feature-icon bg-primary text-white rounded-circle me-4" style="width: 100px; height: 100px; font-size: 2.5rem;">
+                    <i class="fas fa-user-md"></i>
+                </div>
+                <div>
+                    <h2 class="mb-1">Dr. {{ doctor.user.get_full_name }}</h2>
+                    <h5 class="text-primary mb-2">{{ doctor.specialization.name }}</h5>
+                    <p class="text-muted mb-0">
+                        <i class="fas fa-graduation-cap me-1"></i>{{ doctor.experience_years }} years of experience
+                    </p>
+                </div>
+            </div>
+            
+            {% if doctor.bio %}
+                <div class="mb-4">
+                    <h5>About</h5>
+                    <p>{{ doctor.bio }}</p>
+                </div>
+            {% endif %}
+            
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <h6><i class="fas fa-info-circle me-2 text-primary"></i>Doctor Information</h6>
+                    <ul class="list-unstyled">
+                        <li><strong>License Number:</strong> {{ doctor.license_number }}</li>
+                        <li><strong>Phone:</strong> {{ doctor.phone_number }}</li>
+                        <li><strong>Email:</strong> {{ doctor.user.email }}</li>
+                        <li><strong>Consultation Fee:</strong> <span class="text-success">${{ doctor.consultation_fee }}</span></li>
+                    </ul>
+                </div>
+                <div class="col-md-6">
+                    <h6><i class="fas fa-clock me-2 text-primary"></i>Availability</h6>
+                    {% if schedules %}
+                        {% for schedule in schedules %}
+                            <div class="schedule-item">
+                                <strong>{{ schedule.get_day_of_week_display }}</strong><br>
+                                <small class="text-muted">{{ schedule.start_time|time:"g:i A" }} - {{ schedule.end_time|time:"g:i A" }}</small>
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <p class="text-muted">Schedule not available</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0"><i class="fas fa-calendar-plus me-2"></i>Book Appointment</h5>
+            </div>
+            <div class="card-body">
+                {% if user.is_authenticated and user.patient %}
+                    <p class="mb-3">Ready to schedule your appointment with Dr. {{ doctor.user.get_full_name }}?</p>
+                    <div class="d-grid">
+                        <a href="{% url 'appointments:book_appointment' doctor.id %}" class="btn btn-primary btn-lg">
+                            <i class="fas fa-calendar-plus me-2"></i>Book Now
+                        </a>
+                    </div>
+                {% elif user.is_authenticated %}
+                    <div class="alert alert-warning">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        You need to register as a patient to book appointments.
+                    </div>
+                    <div class="d-grid">
+                        <a href="{% url 'patients:patient_register' %}" class="btn btn-warning">
+                            <i class="fas fa-user-plus me-2"></i>Register as Patient
+                        </a>
+                    </div>
+                {% else %}
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i>
+                        Please login or register to book an appointment.
+                    </div>
+                    <div class="d-grid gap-2">
+                        <a href="{% url 'admin:login' %}" class="btn btn-primary">
+                            <i class="fas fa-sign-in-alt me-2"></i>Login
+                        </a>
+                        <a href="{% url 'patients:patient_register' %}" class="btn btn-outline-primary">
+                            <i class="fas fa-user-plus me-2"></i>Register
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+        
+        <div class="card mt-4">
+            <div class="card-header">
+                <h6 class="mb-0"><i class="fas fa-star me-2 text-warning"></i>Specialization Info</h6>
+            </div>
+            <div class="card-body">
+                <h6>{{ doctor.specialization.name }}</h6>
+                {% if doctor.specialization.description %}
+                    <p class="small text-muted">{{ doctor.specialization.description }}</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="mt-4">
+    <a href="{% url 'doctors:doctor_list' %}" class="btn btn-outline-secondary">
+        <i class="fas fa-arrow-left me-2"></i>Back to Doctors List
+    </a>
+</div>
+{% endblock %}

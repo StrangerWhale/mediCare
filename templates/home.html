@@ -1,0 +1,170 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="hero-section bg-primary text-white py-5 mb-5 rounded">
+    <div class="container text-center">
+        <h1 class="display-4 mb-4">
+            <i class="fas fa-heartbeat me-3"></i>Welcome to mediCare
+        </h1>
+        <p class="lead mb-4">Your trusted healthcare appointment management system</p>
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <p class="mb-4">Book appointments with qualified doctors, manage your medical records, and take control of your healthcare journey.</p>
+                <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+                    <a href="{% url 'doctors:doctor_list' %}" class="btn btn-light btn-lg me-md-2">
+                        <i class="fas fa-search me-2"></i>Find Doctors
+                    </a>
+                    {% if not user.is_authenticated %}
+                        <a href="{% url 'patients:patient_register' %}" class="btn btn-outline-light btn-lg">
+                            <i class="fas fa-user-plus me-2"></i>Register Now
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-4 mb-4">
+        <div class="card h-100 shadow-sm">
+            <div class="card-body text-center">
+                <div class="feature-icon bg-primary text-white rounded-circle mx-auto mb-3">
+                    <i class="fas fa-user-md"></i>
+                </div>
+                <h5 class="card-title">Find Qualified Doctors</h5>
+                <p class="card-text">Search and book appointments with experienced doctors across various specializations.</p>
+                <a href="{% url 'doctors:doctor_list' %}" class="btn btn-primary">Browse Doctors</a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4 mb-4">
+        <div class="card h-100 shadow-sm">
+            <div class="card-body text-center">
+                <div class="feature-icon bg-success text-white rounded-circle mx-auto mb-3">
+                    <i class="fas fa-calendar-check"></i>
+                </div>
+                <h5 class="card-title">Easy Appointment Booking</h5>
+                <p class="card-text">Book, reschedule, or cancel appointments with just a few clicks. Real-time availability.</p>
+                {% if user.is_authenticated and user.patient %}
+                    <a href="{% url 'appointments:my_appointments' %}" class="btn btn-success">My Appointments</a>
+                {% else %}
+                    <a href="{% url 'patients:patient_register' %}" class="btn btn-success">Get Started</a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4 mb-4">
+        <div class="card h-100 shadow-sm">
+            <div class="card-body text-center">
+                <div class="feature-icon bg-info text-white rounded-circle mx-auto mb-3">
+                    <i class="fas fa-file-medical"></i>
+                </div>
+                <h5 class="card-title">Medical Records</h5>
+                <p class="card-text">Keep track of your medical history, prescriptions, and treatment records in one place.</p>
+                {% if user.is_authenticated and user.patient %}
+                    <a href="{% url 'patients:medical_records' %}" class="btn btn-info">View Records</a>
+                {% else %}
+                    <a href="{% url 'patients:patient_register' %}" class="btn btn-info">Register</a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+{% if user.is_authenticated %}
+    {% if user.patient %}
+        <div class="row mt-5">
+            <div class="col-12">
+                <h3 class="mb-4">Quick Actions</h3>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <div class="card bg-light">
+                            <div class="card-body">
+                                <h5 class="card-title">
+                                    <i class="fas fa-tachometer-alt me-2 text-primary"></i>Dashboard
+                                </h5>
+                                <p class="card-text">View your upcoming appointments and health summary.</p>
+                                <a href="{% url 'patients:patient_dashboard' %}" class="btn btn-primary">Go to Dashboard</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <div class="card bg-light">
+                            <div class="card-body">
+                                <h5 class="card-title">
+                                    <i class="fas fa-user-edit me-2 text-success"></i>Profile
+                                </h5>
+                                <p class="card-text">Update your personal and medical information.</p>
+                                <a href="{% url 'patients:patient_profile' %}" class="btn btn-success">View Profile</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% elif user.doctor %}
+        <div class="row mt-5">
+            <div class="col-12">
+                <h3 class="mb-4">Doctor Portal</h3>
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <div class="card bg-light">
+                            <div class="card-body">
+                                <h5 class="card-title">
+                                    <i class="fas fa-tachometer-alt me-2 text-primary"></i>Dashboard
+                                </h5>
+                                <p class="card-text">View your appointments and patient overview.</p>
+                                <a href="{% url 'doctors:doctor_dashboard' %}" class="btn btn-primary">Dashboard</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <div class="card bg-light">
+                            <div class="card-body">
+                                <h5 class="card-title">
+                                    <i class="fas fa-calendar me-2 text-success"></i>Schedule
+                                </h5>
+                                <p class="card-text">Manage your availability and working hours.</p>
+                                <a href="{% url 'doctors:manage_schedule' %}" class="btn btn-success">Manage Schedule</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <div class="card bg-light">
+                            <div class="card-body">
+                                <h5 class="card-title">
+                                    <i class="fas fa-users me-2 text-info"></i>Appointments
+                                </h5>
+                                <p class="card-text">View and manage patient appointments.</p>
+                                <a href="{% url 'doctors:doctor_appointments' %}" class="btn btn-info">View Appointments</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+{% else %}
+    <div class="row mt-5">
+        <div class="col-12">
+            <div class="card bg-light">
+                <div class="card-body text-center">
+                    <h4 class="card-title">Ready to Get Started?</h4>
+                    <p class="card-text">Join thousands of patients and doctors who trust mediCare for their healthcare needs.</p>
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+                        <a href="{% url 'patients:patient_register' %}" class="btn btn-primary btn-lg me-md-2">
+                            <i class="fas fa-user me-2"></i>Register as Patient
+                        </a>
+                        <a href="{% url 'doctors:doctor_register' %}" class="btn btn-outline-primary btn-lg">
+                            <i class="fas fa-user-md me-2"></i>Register as Doctor
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endif %}
+{% endblock %}

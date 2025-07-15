@@ -1,0 +1,118 @@
+{% extends 'base.html' %}
+
+{% block title %}Book Appointment - Dr. {{ doctor.user.get_full_name }} - mediCare{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8">
+        <div class="appointment-form">
+            <h3 class="mb-4">
+                <i class="fas fa-calendar-plus me-2 text-primary"></i>Book Appointment
+            </h3>
+            
+            <div class="doctor-info bg-light p-3 rounded mb-4">
+                <div class="d-flex align-items-center">
+                    <div class="feature-icon bg-primary text-white rounded-circle me-3" style="width: 60px; height: 60px;">
+                        <i class="fas fa-user-md"></i>
+                    </div>
+                    <div>
+                        <h5 class="mb-1">Dr. {{ doctor.user.get_full_name }}</h5>
+                        <p class="text-muted mb-0">{{ doctor.specialization.name }}</p>
+                        <small class="text-success">Consultation Fee: ${{ doctor.consultation_fee }}</small>
+                    </div>
+                </div>
+            </div>
+            
+            <form method="post" id="appointment-form" data-doctor-id="{{ doctor.id }}" class="needs-validation" novalidate>
+                {% csrf_token %}
+                
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="{{ form.appointment_date.id_for_label }}" class="form-label">Appointment Date</label>
+                        {{ form.appointment_date }}
+                        {% if form.appointment_date.errors %}
+                            <div class="invalid-feedback d-block">{{ form.appointment_date.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Appointment Time</label>
+                        <input type="hidden" id="id_appointment_time" name="appointment_time" required>
+                        <div id="time-slots" class="mt-2">
+                            <p class="text-muted">Please select a date to view available time slots.</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="{{ form.symptoms.id_for_label }}" class="form-label">Symptoms / Reason for Visit</label>
+                    {{ form.symptoms }}
+                    {% if form.symptoms.errors %}
+                        <div class="invalid-feedback d-block">{{ form.symptoms.errors.0 }}</div>
+                    {% endif %}
+                </div>
+                
+                <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                    <a href="{% url 'doctors:doctor_detail' doctor.id %}" class="btn btn-outline-secondary me-md-2">
+                        <i class="fas fa-arrow-left me-1"></i>Back
+                    </a>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-calendar-check me-2"></i>Book Appointment
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h6 class="mb-0"><i class="fas fa-clock me-2"></i>Doctor's Schedule</h6>
+            </div>
+            <div class="card-body">
+                {% if schedules %}
+                    {% for schedule in schedules %}
+                        <div class="schedule-item mb-2">
+                            <strong>{{ schedule.get_day_of_week_display }}</strong><br>
+                            <small class="text-muted">{{ schedule.start_time|time:"g:i A" }} - {{ schedule.end_time|time:"g:i A" }}</small>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <p class="text-muted">Schedule not available</p>
+                {% endif %}
+            </div>
+        </div>
+        
+        <div class="card mt-3">
+            <div class="card-header">
+                <h6 class="mb-0"><i class="fas fa-info-circle me-2"></i>Booking Information</h6>
+            </div>
+            <div class="card-body">
+                <ul class="list-unstyled small">
+                    <li><i class="fas fa-check text-success me-2"></i>Appointments can be cancelled up to 24 hours before</li>
+                    <li><i class="fas fa-check text-success me-2"></i>You will receive a confirmation email</li>
+                    <li><i class="fas fa-check text-success me-2"></i>Please arrive 15 minutes early</li>
+                    <li><i class="fas fa-check text-success me-2"></i>Bring your ID and insurance card</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const dateInput = document.getElementById('id_appointment_date');
+    const doctorId = document.getElementById('appointment-form').dataset.doctorId;
+    
+    if (dateInput) {
+        dateInput.addEventListener('change', function() {
+            const selectedDate = this.value;
+            if (selectedDate) {
+                loadAvailableSlots(doctorId, selectedDate);
+            }
+        });
+    }
+});
+</script>
+{% endblock %}
