@@ -11,6 +11,12 @@ class Category(models.Model):
     
     class Meta:
         verbose_name_plural = "Categories"
+class Specialization(models.Model):
+    name = models.CharField(max_length=100, unique=True)
+    description = models.TextField(blank=True)
+
+    def __str__(self):
+        return self.name
 
 class Doctor(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)

@@ -30,3 +30,17 @@ class PatientRegistrationForm(UserCreationForm):
                 phone_number=self.cleaned_data['phone_number']
             )
         return user
+    
+
+class PatientProfileForm(forms.ModelForm):
+    class Meta:
+        model = Patient
+        fields = ['phone_number']
+        widgets = {
+            'phone_number': forms.TextInput(attrs={'class': 'form-control'}),
+        }
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field in self.fields.values():
+            field.widget.attrs.update({'class': 'form-control'})
